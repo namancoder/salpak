@@ -68,22 +68,37 @@ class _SavedNewsState extends State<SavedNews> {
                 padding: EdgeInsets.all(8.0),
                 itemCount: list.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: IconButton(
-                      icon: Icon(Icons.saved_search_outlined),
-                      onPressed: () async {
-                        print("$index  is remove");
-                        _remove(index);
-                        setState(() {});
-                      },
-                    ),
-                    title: Text(
-                      snapshot.data![int.parse(list[index])].title,
-                      maxLines: 2,
-                    ),
-                    subtitle: Text(
-                      snapshot.data![int.parse(list[index])].summary,
-                      maxLines: 2,
+                  return Container(
+                     margin: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
+                     decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, .3),
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10))
+                              ]),
+                    child: ListTile(
+                      // leading: IconButton(
+                      //   icon: Icon(Icons.delete, color: Colors.red,),
+                      //   onPressed: () async {
+                      //     print(list[index] + "is remove");
+                      //     _remove(index);
+                      //     setState(() {});
+                      //         print(list.toString());
+
+                      //   },
+                      // ),
+                      title: Text(
+                        snapshot.data![int.parse(list[index])].title,
+                        maxLines: 2,
+                      ),
+                      subtitle: Text(
+                        snapshot.data![int.parse(list[index])].summary,
+                        maxLines: 2,
+                      ),
                     ),
                   );
                 });
@@ -109,6 +124,8 @@ class _SavedNewsState extends State<SavedNews> {
     list.removeWhere((element) => element == list[index]);
     prefs.setStringList('list', list);
     print(list.length);
-    setState(() {});
+    setState(() {
+      initState();
+    });
   }
 }

@@ -8,14 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'news.dart';
 
-
-
 Future<List<News>> fetchNews() async {
   final response =
       await http.get(Uri.parse("https://api.first.org/data/v1/news"));
 
   if (response.statusCode == 200) {
-    print(response.body);
     var list = json.decode(response.body);
     var ero = list["data"];
     List<News> pikachu = [];
@@ -62,13 +59,15 @@ class _NewsPageState extends State<NewsPage> {
 
   initSharedPreferences() async {
     prefs = await SharedPreferences.getInstance();
-    //loadData();
+    list = prefs.getStringList('list')!;
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.red,
         title: Text("News"),
       ),
       body: selectedIndex == 0 ? futurexx() : SavedNews(),
@@ -84,8 +83,7 @@ class _NewsPageState extends State<NewsPage> {
           ),
         ],
         currentIndex: selectedIndex,
-        onTap: (index) =>
-            setState(() => selectedIndex = index == 0 ? 0 : 1),
+        onTap: (index) => setState(() => selectedIndex = index == 0 ? 0 : 1),
       ),
     );
   }
@@ -95,32 +93,57 @@ class _NewsPageState extends State<NewsPage> {
         future: fetchNews(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data);
             return ListView.builder(
                 padding: EdgeInsets.all(8.0),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: IconButton(
-                      icon: (list.indexOf(index.toString()) >= 0)
-                          ? Image.asset("assets/redheart.png",
-                              width: 24.0, height: 24.0)
-                          : Image.asset("assets/whiteheart.png",
-                              width: 24.0, height: 24.0),
-                      onPressed: ()  {
-                        print("$index  is pressed");
+                  return Container(
+                    margin: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
+                     decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, .3),
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10))
+                              ]),
+                    child: ListTile(
+                      leading: IconButton(
+                        icon: (list.indexOf(index.toString()) >= 0)
+                            ? Image.asset("assets/redheart.png",
+                                width: 24.0, height: 24.0)
+                            : Image.asset("assets/whiteheart.png",
+                                width: 24.0, height: 24.0),
+                        onPressed: () {
+                          print("$index  is pressed");
+                          if (list.indexOf(index.toString()) >= 0)
+                            _remove(index);
+                          else
+                            _addtoList(index);
 
-                         _addtoList(index);
-                        setState(() {});
-                      },
-                    ),
-                    title: Text(
-                      snapshot.data![index].title,
-                      maxLines: 2,
-                    ),
-                    subtitle: Text(
-                      snapshot.data![index].summary,
-                      maxLines: 2,
+                          setState(() {});
+                        },
+                      ),
+                      title: Text(
+                        snapshot.data![index].title,
+                        maxLines: 2,
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            snapshot.data![index].summary,
+                            maxLines: 2,
+                          )
+                          ,
+                          SizedBox(height:5.0),  Text(
+                            snapshot.data![index].published,
+                            style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.w200),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 });
@@ -136,7 +159,16 @@ class _NewsPageState extends State<NewsPage> {
       list.add(value.toString());
     prefs.setStringList("list", list);
     print(list.length);
+  }
 
-    ////print(prefer);
+  Future _remove(int index) async {
+    list = prefs.getStringList('list')!;
+    print("BEFORE");
+    print(list.length);
+    print(list.toString());
+    list.removeWhere((element) => element == list[index]);
+    prefs.setStringList('list', list);
+    print(list.length);
+    //setState(() {});
   }
 }
