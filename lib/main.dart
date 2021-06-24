@@ -1,5 +1,9 @@
+//import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:flutter/material.dart';
 import 'package:salpak/newsfeed.dart';
+//import 'package:http/http.dart' as http;
 
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -7,6 +11,12 @@ void main() => runApp(MaterialApp(
     ));
 
 class HomePage extends StatelessWidget {
+  TextEditingController controller = new TextEditingController();
+  TextEditingController _controller = new TextEditingController();
+
+  String email = "fvfv";
+  String password = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,13 +25,9 @@ class HomePage extends StatelessWidget {
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("assets/bg.png"), fit: BoxFit.fill),
-              gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-                Colors.orange[900]!,
-                Colors.orange[800]!,
-                Colors.orange[400]!
-              ])),
+            image: DecorationImage(
+                image: AssetImage("assets/bg.png"), fit: BoxFit.fill),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             //mainAxisAlignment: MainAxisAlignment.en,
@@ -31,24 +37,12 @@ class HomePage extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Login",
-                      style: TextStyle(color: Colors.black, fontSize: 40),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      "Welcome Back",
-                      style: TextStyle(color: Colors.black, fontSize: 18),
-                    ),
-                  ],
+                child: Text(
+                  "Welcome Back",
+                  style: TextStyle(color: Colors.black, fontSize: 38),
                 ),
               ),
-              SizedBox(height: 200),
+              SizedBox(height: 300),
               Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -66,7 +60,7 @@ class HomePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                    color: Color.fromRGBO(225, 95, 27, .3),
+                                    color: Color.fromRGBO(0, 0, 0, .01),
                                     blurRadius: 20,
                                     offset: Offset(0, 10))
                               ]),
@@ -79,6 +73,12 @@ class HomePage extends StatelessWidget {
                                         bottom: BorderSide(
                                             color: Colors.grey[200]!))),
                                 child: TextField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.emailAddress,
+                                  onSubmitted: (value) {
+                                    email = value;
+                                    print(controller.text);
+                                  },
                                   decoration: InputDecoration(
                                       hintText: "Email or Phone number",
                                       hintStyle: TextStyle(color: Colors.grey),
@@ -92,6 +92,12 @@ class HomePage extends StatelessWidget {
                                         bottom: BorderSide(
                                             color: Colors.grey[200]!))),
                                 child: TextField(
+                                  controller: _controller,
+                                  keyboardType: TextInputType.emailAddress,
+                                  onSubmitted: (value) {
+                                    password = value;
+                                    print(_controller.text);
+                                  },
                                   decoration: InputDecoration(
                                       hintText: "Password",
                                       hintStyle: TextStyle(color: Colors.grey),
@@ -108,18 +114,35 @@ class HomePage extends StatelessWidget {
                             style: TextStyle(color: Colors.grey),
                           ),
                         ),
-                        Container(
-                          height: 50,
-                          margin: EdgeInsets.symmetric(horizontal: 50),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              color: Colors.orange[900]),
-                          child: Center(
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
+                        GestureDetector(
+                          onTap: () {
+                            print(email + " " + password);
+                            print(controller.text);
+
+                            if (controller.text == "testemail" &&
+                                _controller.text == "testpassword") {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NewsPage()));
+                            } else {
+                              Fluttertoast.showToast(
+                                  msg: "Incorrect Email Entered");
+                            }
+                          },
+                          child: Container(
+                            height: 50,
+                            margin: EdgeInsets.symmetric(horizontal: 50),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.orange[900]),
+                            child: Center(
+                              child: Text(
+                                "Login",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
                           ),
                         ),
@@ -156,7 +179,12 @@ class HomePage extends StatelessWidget {
                                     style: TextStyle(
                                       color: Colors.white,
                                     )),
-                                onPressed: () => {Navigator.push(context,MaterialPageRoute(builder: (context)=>NewsPage()))},
+                                onPressed: () => {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => NewsPage()))
+                                },
                               ),
                             )),
                           ],

@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'news.dart';
 
+
+
 Future<List<News>> fetchNews() async {
   final response =
       await http.get(Uri.parse("https://api.first.org/data/v1/news"));
@@ -18,11 +20,8 @@ Future<List<News>> fetchNews() async {
     var ero = list["data"];
     List<News> pikachu = [];
     print("list.length");
-    int i = 0;
     print(ero.length);
     for (var u in ero) {
-      print("$i");
-      i++;
       News news = News(
         id: u["id"] == null ? null : u["id"],
         title: u["title"] == null ? " " : u["title"],
@@ -48,16 +47,22 @@ class NewsPage extends StatefulWidget {
 }
 
 class _NewsPageState extends State<NewsPage> {
-  //late Future<List<News>> futureNews;
   int selectedIndex = 0;
+  late SharedPreferences prefs;
+  List<String> list = [];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // futureNews = fetchNews();
-    // print("FUTURE NEWS");
-    // print(futureNews.toString());
+    initSharedPreferences();
+
     setState(() {});
+  }
+
+  initSharedPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    //loadData();
   }
 
   @override
@@ -80,46 +85,58 @@ class _NewsPageState extends State<NewsPage> {
         ],
         currentIndex: selectedIndex,
         onTap: (index) =>
-            setState(() => selectedIndex = selectedIndex == 0 ? 1 : 0),
+            setState(() => selectedIndex = index == 0 ? 0 : 1),
       ),
     );
   }
-}
 
-Widget futurexx() {
-  return FutureBuilder<List<News>>(
-      future: fetchNews(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print(snapshot.data);
-          //print(snapshot.data.length.toString());
-          return ListView.builder(
-              padding: EdgeInsets.all(8.0),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: IconButton(
-                    icon: Icon(Icons.saved_search_outlined),
-                    onPressed: () {
-                      _addtoList() async {
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        int counter = (prefs.getInt('counter')??0)
-                      }
-                      
-                    },
-                  ),
-                  title: Text(
-                    snapshot.data![index].title,
-                    maxLines: 2,
-                  ),
-                  subtitle: Text(
-                    snapshot.data![index].summary,
-                    maxLines: 2,
-                  ),
-                );
-              });
-        } else {
-          return Center(child: CircularProgressIndicator());
-        }
-      });
+  Widget futurexx() {
+    return FutureBuilder<List<News>>(
+        future: fetchNews(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            return ListView.builder(
+                padding: EdgeInsets.all(8.0),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: IconButton(
+                      icon: (list.indexOf(index.toString()) >= 0)
+                          ? Image.asset("assets/redheart.png",
+                              width: 24.0, height: 24.0)
+                          : Image.asset("assets/whiteheart.png",
+                              width: 24.0, height: 24.0),
+                      onPressed: ()  {
+                        print("$index  is pressed");
+
+                         _addtoList(index);
+                        setState(() {});
+                      },
+                    ),
+                    title: Text(
+                      snapshot.data![index].title,
+                      maxLines: 2,
+                    ),
+                    subtitle: Text(
+                      snapshot.data![index].summary,
+                      maxLines: 2,
+                    ),
+                  );
+                });
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        });
+  }
+
+  Future _addtoList(int value) async {
+    if (list.indexOf(value.toString()) >= 0) {
+    } else
+      list.add(value.toString());
+    prefs.setStringList("list", list);
+    print(list.length);
+
+    ////print(prefer);
+  }
 }
